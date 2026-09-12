@@ -1,0 +1,18 @@
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/articles/WSwavelet_vignette.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/reference/WSwavelet-package.html</loc></url>
+<url><loc>/reference/estimate_noise_sd.html</loc></url>
+<url><loc>/reference/evaluate_shrinkage_curve.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/level_posterior.html</loc></url>
+<url><loc>/reference/semicircle_kernel.html</loc></url>
+<url><loc>/reference/wendland_kernel.html</loc></url>
+<url><loc>/reference/ws_numerical_checks.html</loc></url>
+<url><loc>/reference/wswavelet.html</loc></url>
+</urlset>
+
