@@ -95,9 +95,6 @@ Sanyal</h4>
 
     
     
-<p><sub></sub>~{r, include=FALSE} knitr::opts_chunk$set( collapse =
-TRUE, comment = “#&gt;”, message = FALSE, warning = FALSE, fig.align =
-“center” ) <sub></sub>~</p>
 <div class="section level2">
 <h2 id="introduction-and-overview">Introduction and overview<a class="anchor" aria-label="anchor" href="#introduction-and-overview"></a>
 </h2>
@@ -153,11 +150,12 @@ requires a finite input vector of dyadic length, such as 128, 256, or
 </h3>
 <p>Install the wavelet dependency and then install the WSwavelet source
 archive:</p>
-<p><sub></sub>~{r, eval=FALSE} install.packages(“wavethresh”)
-install.packages(“WSwavelet_0.1.0.tar.gz”, repos = NULL, type =
-“source”) <sub></sub>~</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"wavethresh"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"WSwavelet_0.1.0.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
 <p>Load the package:</p>
-<p><sub></sub>~{r} library(WSwavelet) <sub></sub>~</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nilotpalsanyal.github.io/WSwavelet" class="external-link">WSwavelet</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="a-reproducible-synthetic-signal">A reproducible synthetic signal<a class="anchor" aria-label="anchor" href="#a-reproducible-synthetic-signal"></a>
@@ -166,50 +164,109 @@ install.packages(“WSwavelet_0.1.0.tar.gz”, repos = NULL, type =
 following example combines a smooth oscillation with a narrow peak and
 two localized transitions, giving the denoiser several types of
 structure to recover.</p>
-<p><sub></sub>~{r} set.seed(2026)</p>
-<p>n &lt;- 256L x &lt;- seq(0, 1, length.out = n)</p>
-<p>demo_signal &lt;- function(x) { 1.2 * sin(4 * pi * x) + 3.0 *
-exp(-((x - 0.32) / 0.025)^2) + 2.0 * exp(-((x - 0.73) / 0.05)^2) - 1.4 *
-(x &gt; 0.52) + 1.0 * (x &gt; 0.84) }</p>
-<p>truth &lt;- demo_signal(x) y &lt;- truth + rnorm(n, sd = 0.55)</p>
-<p>plot( x, y, type = “l”, col = “grey55”, xlab = “Standardized
-location”, ylab = “Signal value”, main = “Observed signal and noise-free
-reference” ) lines(x, truth, col = “navy”, lwd = 2) legend( “topright”,
-legend = c(“Observed”, “Reference”), col = c(“grey55”, “navy”), lty = 1,
-lwd = c(1, 2), bty = “n” ) <sub></sub>~</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2026</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">256L</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">demo_signal</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fl">1.2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">4</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fl">3.0</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="fl">0.32</span><span class="op">)</span> <span class="op">/</span> <span class="fl">0.025</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fl">2.0</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="fl">0.73</span><span class="op">)</span> <span class="op">/</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">-</span></span>
+<span>    <span class="fl">1.4</span> <span class="op">*</span> <span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">0.52</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fl">1.0</span> <span class="op">*</span> <span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">0.84</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">truth</span> <span class="op">&lt;-</span> <span class="fu">demo_signal</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">truth</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, sd <span class="op">=</span> <span class="fl">0.55</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>, <span class="va">y</span>, type <span class="op">=</span> <span class="st">"l"</span>, col <span class="op">=</span> <span class="st">"grey55"</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Standardized location"</span>, ylab <span class="op">=</span> <span class="st">"Signal value"</span>,</span>
+<span>  main <span class="op">=</span> <span class="st">"Observed signal and noise-free reference"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">truth</span>, col <span class="op">=</span> <span class="st">"navy"</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span></span>
+<span>  <span class="st">"topright"</span>,</span>
+<span>  legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Observed"</span>, <span class="st">"Reference"</span><span class="op">)</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grey55"</span>, <span class="st">"navy"</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">1</span>, lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  bty <span class="op">=</span> <span class="st">"n"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="WSwavelet_vignette_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="fitting-the-primary-gaussian-version">Fitting the primary Gaussian version<a class="anchor" aria-label="anchor" href="#fitting-the-primary-gaussian-version"></a>
 </h3>
-<p>The main function is wswavelet(). For a quick vignette run, the
-example uses a short wavelet filter and 24 quadrature nodes. For
-production analyses, the default filter and quadrature settings can be
-used or increased after checking computational cost.</p>
-<p><sub></sub>~{r} fit_g &lt;- wswavelet( y = y, likelihood =
-“gaussian”, filter.number = 6L, family = “DaubExPhase”, bc = “periodic”,
-quadrature_n = 24L )</p>
-<p>plot( x, y, type = “l”, col = “grey60”, xlab = “Standardized
-location”, ylab = “Signal value”, main = “WS-Gaussian reconstruction” )
-lines(x, truth, col = “navy”, lwd = 2) lines(x, fit_g$estimate, col =
-“firebrick”, lwd = 2) legend( “topright”, legend = c(“Observed”,
-“Reference”, “WS-Gaussian”), col = c(“grey60”, “navy”, “firebrick”), lty
-= 1, lwd = c(1, 2, 2), bty = “n” ) <sub></sub>~</p>
+<p>The main function is <code><a href="../reference/wswavelet.html">wswavelet()</a></code>. For a quick vignette
+run, the example uses a short wavelet filter and 24 quadrature nodes.
+For production analyses, the default filter and quadrature settings can
+be used or increased after checking computational cost.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit_g</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wswavelet.html">wswavelet</a></span><span class="op">(</span></span>
+<span>  y <span class="op">=</span> <span class="va">y</span>,</span>
+<span>  likelihood <span class="op">=</span> <span class="st">"gaussian"</span>,</span>
+<span>  filter.number <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">"DaubExPhase"</span>,</span>
+<span>  bc <span class="op">=</span> <span class="st">"periodic"</span>,</span>
+<span>  quadrature_n <span class="op">=</span> <span class="fl">24L</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>, <span class="va">y</span>, type <span class="op">=</span> <span class="st">"l"</span>, col <span class="op">=</span> <span class="st">"grey60"</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Standardized location"</span>, ylab <span class="op">=</span> <span class="st">"Signal value"</span>,</span>
+<span>  main <span class="op">=</span> <span class="st">"WS-Gaussian reconstruction"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">truth</span>, col <span class="op">=</span> <span class="st">"navy"</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">fit_g</span><span class="op">$</span><span class="va">estimate</span>, col <span class="op">=</span> <span class="st">"firebrick"</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span></span>
+<span>  <span class="st">"topright"</span>,</span>
+<span>  legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Observed"</span>, <span class="st">"Reference"</span>, <span class="st">"WS-Gaussian"</span><span class="op">)</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grey60"</span>, <span class="st">"navy"</span>, <span class="st">"firebrick"</span><span class="op">)</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>, lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, bty <span class="op">=</span> <span class="st">"n"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="WSwavelet_vignette_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>The fitted signal is stored in fit_g$estimate. Important fitted
 quantities are:</p>
-<p><sub></sub>~{r}
-fit_g<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><msub><mi>a</mi><mi>h</mi></msub><mi>a</mi><mi>t</mi><mi>f</mi><mi>i</mi><msub><mi>t</mi><mi>g</mi></msub></mrow><annotation encoding="application/x-tex">sigma_hat
-fit_g</annotation></semantics></math>eta_hat
-fit_g<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>o</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>m</mi><mi>i</mi><mi>z</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">optimization</annotation></semantics></math>convergence
-<sub></sub>~</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit_g</span><span class="op">$</span><span class="va">sigma_hat</span></span>
+<span><span class="co">#&gt; [1] 0.5958579</span></span>
+<span><span class="va">fit_g</span><span class="op">$</span><span class="va">eta_hat</span></span>
+<span><span class="co">#&gt; [1] -12 -12</span></span>
+<span><span class="va">fit_g</span><span class="op">$</span><span class="va">optimization</span><span class="op">$</span><span class="va">convergence</span></span>
+<span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
 <p>The level summary gives the resolution-specific hyperparameters and
 average posterior component probabilities:</p>
-<p><sub></sub>~{r} head( fit_g$level_summary[, c( “level”,
-“coefficients”, “spike_probability”, “beta”, “omega”, “mean_p0”,
-“mean_pW”, “mean_pS” )] ) <sub></sub>~</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span></span>
+<span>  <span class="va">fit_g</span><span class="op">$</span><span class="va">level_summary</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"level"</span>, <span class="st">"coefficients"</span>, <span class="st">"spike_probability"</span>, <span class="st">"beta"</span>, <span class="st">"omega"</span>,</span>
+<span>    <span class="st">"mean_p0"</span>, <span class="st">"mean_pW"</span>, <span class="st">"mean_pS"</span></span>
+<span>  <span class="op">)</span><span class="op">]</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;   level coefficients spike_probability     beta        omega      mean_p0</span></span>
+<span><span class="co">#&gt; 0     0            1         0.8105354 4.180959 6.144175e-06 1.815194e-09</span></span>
+<span><span class="co">#&gt; 1     1            2         0.9284007 8.109933 1.106524e-06 8.746042e-08</span></span>
+<span><span class="co">#&gt; 2     2            4         0.9641032 6.232857 1.992767e-07 2.587512e-01</span></span>
+<span><span class="co">#&gt; 3     3            8         0.9789878 4.363048 3.588820e-08 4.975558e-01</span></span>
+<span><span class="co">#&gt; 4     4           16         0.9864345 3.537500 6.463190e-09 8.689578e-01</span></span>
+<span><span class="co">#&gt; 5     5           32         0.9906295 2.427249 1.163971e-09 9.582905e-01</span></span>
+<span><span class="co">#&gt;        mean_pW    mean_pS</span></span>
+<span><span class="co">#&gt; 0 1.607347e-07 0.99999984</span></span>
+<span><span class="co">#&gt; 1 3.597331e-07 0.99999955</span></span>
+<span><span class="co">#&gt; 2 4.669356e-08 0.74124880</span></span>
+<span><span class="co">#&gt; 3 4.550149e-09 0.50244424</span></span>
+<span><span class="co">#&gt; 4 1.672502e-10 0.13104221</span></span>
+<span><span class="co">#&gt; 5 1.663571e-11 0.04170949</span></span></code></pre></div>
 <p>The fitted detail-level objects contain the observed coefficients,
 posterior means, posterior component probabilities, component-specific
 means, support scales, and numerical fallback counts:</p>
-<p><sub></sub>~{r} names(fit_g$detail[[1L]]) <sub></sub>~</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit_g</span><span class="op">$</span><span class="va">detail</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "level"                 "observed"              "estimate"             </span></span>
+<span><span class="co">#&gt;  [4] "posterior_probability" "component_mean"        "component_log_m0"     </span></span>
+<span><span class="co">#&gt;  [7] "beta"                  "spike_probability"     "omega"                </span></span>
+<span><span class="co">#&gt; [10] "quadrature_fallbacks"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -269,13 +326,20 @@ g_S(\theta;\beta)=\frac{1}{\beta}K_S(\theta/\beta).
 The Wendland component is more concentrated near zero, whereas the
 semicircle component is more dispersed.</p>
 <p>The densities can be evaluated directly:</p>
-<p><sub></sub>~{r} u &lt;- seq(-1.1, 1.1, length.out = 501L) plot( u,
-wendland_kernel(u), type = “l”, lwd = 2, col = “dodgerblue3”, ylim =
-c(0, 1.6), xlab = “Standardized coefficient”, ylab = “Density”, main =
-“The two standardized slab densities” ) lines(u, semicircle_kernel(u),
-lwd = 2, col = “darkorange2”) legend( “top”, legend = c(“Wendland”,
-“Semicircle”), col = c(“dodgerblue3”, “darkorange2”), lty = 1, lwd = 2,
-bty = “n” ) <sub></sub>~</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">u</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.1</span>, <span class="fl">1.1</span>, length.out <span class="op">=</span> <span class="fl">501L</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">u</span>, <span class="fu"><a href="../reference/wendland_kernel.html">wendland_kernel</a></span><span class="op">(</span><span class="va">u</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"l"</span>, lwd <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"dodgerblue3"</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1.6</span><span class="op">)</span>, xlab <span class="op">=</span> <span class="st">"Standardized coefficient"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"Density"</span>, main <span class="op">=</span> <span class="st">"The two standardized slab densities"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">u</span>, <span class="fu"><a href="../reference/semicircle_kernel.html">semicircle_kernel</a></span><span class="op">(</span><span class="va">u</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"darkorange2"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span></span>
+<span>  <span class="st">"top"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wendland"</span>, <span class="st">"Semicircle"</span><span class="op">)</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dodgerblue3"</span>, <span class="st">"darkorange2"</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">1</span>, lwd <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  bty <span class="op">=</span> <span class="st">"n"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="WSwavelet_vignette_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="spike-and-slab-prior">Spike-and-slab prior<a class="anchor" aria-label="anchor" href="#spike-and-slab-prior"></a>
@@ -347,8 +411,8 @@ support.</p>
 <div class="section level3">
 <h3 id="the-coefficient-level-posterior">The coefficient-level posterior<a class="anchor" aria-label="anchor" href="#the-coefficient-level-posterior"></a>
 </h3>
-<p>The function level_posterior() applies the posterior calculation to a
-vector of coefficients at one level. For c in
+<p>The function <code><a href="../reference/level_posterior.html">level_posterior()</a></code> applies the posterior
+calculation to a vector of coefficients at one level. For c in
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mi>W</mi><mo>,</mo><mi>S</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{W,S\}</annotation></semantics></math>,
 define the component moments</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>M</mi><mrow><mi>r</mi><mo>,</mo><mi>c</mi><mo>,</mo><mi>j</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>d</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mi>−</mi><msub><mi>β</mi><mi>j</mi></msub></mrow><msub><mi>β</mi><mi>j</mi></msub></msubsup><msup><mi>θ</mi><mi>r</mi></msup><msub><mi>g</mi><mi>c</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>θ</mi><mo>;</mo><msub><mi>β</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">)</mo><mi>L</mi><mo stretchy="false" form="prefix">(</mo><mi>d</mi><mo>∣</mo><mi>θ</mi><mo stretchy="false" form="postfix">)</mo><mspace width="0.167em"></mspace><mi>d</mi><mi>θ</mi><mo>,</mo><mspace width="2.0em"></mspace><mi>r</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
@@ -397,52 +461,81 @@ posterior mean is generally a continuous shrinkage rule.</p>
 <div class="section level3">
 <h3 id="inspecting-one-shrinkage-curve">Inspecting one shrinkage curve<a class="anchor" aria-label="anchor" href="#inspecting-one-shrinkage-curve"></a>
 </h3>
-<p>evaluate_shrinkage_curve() evaluates the fitted rule over
-hypothetical coefficient values. level_index is the position of the
+<p><code><a href="../reference/evaluate_shrinkage_curve.html">evaluate_shrinkage_curve()</a></code> evaluates the fitted rule
+over hypothetical coefficient values. level_index is the position of the
 level in fit$detail, not necessarily the numerical wavelet-level
 label.</p>
-<p><sub></sub>~{r} curve_g &lt;- evaluate_shrinkage_curve( fit_g,
-level_index = 1L, d_grid = seq(-3, 3, length.out = 301L) )</p>
-<p>plot(
-curve_g<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>,</mo><mi>c</mi><mi>u</mi><mi>r</mi><mi>v</mi><msub><mi>e</mi><mi>g</mi></msub></mrow><annotation encoding="application/x-tex">d, curve_g</annotation></semantics></math>estimate,
-type = “l”, lwd = 2, col = “firebrick”, xlab = “Observed coefficient d”,
-ylab = “Posterior mean estimate”, main = “Fitted coefficientwise
-shrinkage rule” ) abline(0, 1, lty = 2, col = “grey40”) abline(h = 0,
-col = “grey75”) legend( “topleft”, legend = c(“Posterior mean”,
-“Identity d”), col = c(“firebrick”, “grey40”), lty = c(1, 2), lwd = c(2,
-1), bty = “n” ) <sub></sub>~</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">curve_g</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/evaluate_shrinkage_curve.html">evaluate_shrinkage_curve</a></span><span class="op">(</span></span>
+<span>  <span class="va">fit_g</span>,</span>
+<span>  level_index <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  d_grid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span>, length.out <span class="op">=</span> <span class="fl">301L</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">curve_g</span><span class="op">$</span><span class="va">d</span>, <span class="va">curve_g</span><span class="op">$</span><span class="va">estimate</span>, type <span class="op">=</span> <span class="st">"l"</span>, lwd <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"firebrick"</span>, xlab <span class="op">=</span> <span class="st">"Observed coefficient d"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"Posterior mean estimate"</span>,</span>
+<span>  main <span class="op">=</span> <span class="st">"Fitted coefficientwise shrinkage rule"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, lty <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"grey40"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="fl">0</span>, col <span class="op">=</span> <span class="st">"grey75"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span></span>
+<span>  <span class="st">"topleft"</span>,</span>
+<span>  legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Posterior mean"</span>, <span class="st">"Identity d"</span><span class="op">)</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"firebrick"</span>, <span class="st">"grey40"</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  bty <span class="op">=</span> <span class="st">"n"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="WSwavelet_vignette_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>The posterior component probabilities can be inspected on the same
 grid:</p>
-<p><sub></sub>~{r} matplot( curve_g$d, curve_g[, c(“posterior_spike”,
-“posterior_wendland”, “posterior_semicircle”)], type = “l”, lty = 1, lwd
-= 2, col = c(“grey25”, “dodgerblue3”, “darkorange2”), xlab = “Observed
-coefficient d”, ylab = “Posterior probability”, main = “Posterior
-component probabilities” ) legend( “topright”, legend = c(“Spike”,
-“Wendland”, “Semicircle”), col = c(“grey25”, “dodgerblue3”,
-“darkorange2”), lty = 1, lwd = 2, bty = “n” ) <sub></sub>~</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span></span>
+<span>  <span class="va">curve_g</span><span class="op">$</span><span class="va">d</span>,</span>
+<span>  <span class="va">curve_g</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"posterior_spike"</span>, <span class="st">"posterior_wendland"</span>,</span>
+<span>              <span class="st">"posterior_semicircle"</span><span class="op">)</span><span class="op">]</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"l"</span>, lty <span class="op">=</span> <span class="fl">1</span>, lwd <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grey25"</span>, <span class="st">"dodgerblue3"</span>, <span class="st">"darkorange2"</span><span class="op">)</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Observed coefficient d"</span>, ylab <span class="op">=</span> <span class="st">"Posterior probability"</span>,</span>
+<span>  main <span class="op">=</span> <span class="st">"Posterior component probabilities"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span></span>
+<span>  <span class="st">"topright"</span>,</span>
+<span>  legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Spike"</span>, <span class="st">"Wendland"</span>, <span class="st">"Semicircle"</span><span class="op">)</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grey25"</span>, <span class="st">"dodgerblue3"</span>, <span class="st">"darkorange2"</span><span class="op">)</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>, lwd <span class="op">=</span> <span class="fl">2</span>, bty <span class="op">=</span> <span class="st">"n"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="WSwavelet_vignette_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
-<h3 id="using-level_posterior-independently">Using level_posterior() independently<a class="anchor" aria-label="anchor" href="#using-level_posterior-independently"></a>
+<h3 id="using-level_posterior-independently">Using <code>level_posterior()</code> independently<a class="anchor" aria-label="anchor" href="#using-level_posterior-independently"></a>
 </h3>
 <p>The low-level posterior function is useful when a user already has
 wavelet coefficients and wants posterior quantities without fitting a
 complete signal. For example, the following uses the first fitted
 level’s parameters:</p>
-<p><sub></sub>~{r} level_fit &lt;- fit_g$detail[[1L]]</p>
-<p>post &lt;- level_posterior( d = c(-1, 0, 1), pi_j =
-level_fit<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>p</mi><mi>i</mi><mi>k</mi><msub><mi>e</mi><mi>p</mi></msub><mi>r</mi><mi>o</mi><mi>b</mi><mi>a</mi><mi>b</mi><mi>i</mi><mi>l</mi><mi>i</mi><mi>t</mi><mi>y</mi><mo>,</mo><mi>o</mi><mi>m</mi><mi>e</mi><mi>g</mi><msub><mi>a</mi><mi>j</mi></msub><mo>=</mo><mi>l</mi><mi>e</mi><mi>v</mi><mi>e</mi><msub><mi>l</mi><mi>f</mi></msub><mi>i</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">spike_probability,
-  omega_j = level_fit</annotation></semantics></math>omega, beta_j =
-level_fit<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mi>e</mi><mi>t</mi><mi>a</mi><mo>,</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><mi>a</mi><mo>=</mo><mi>f</mi><mi>i</mi><msub><mi>t</mi><mi>g</mi></msub></mrow><annotation encoding="application/x-tex">beta,
-  sigma = fit_g</annotation></semantics></math>sigma_hat, likelihood =
-fit_g<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>i</mi><mi>k</mi><mi>e</mi><mi>l</mi><mi>i</mi><mi>h</mi><mi>o</mi><mi>o</mi><mi>d</mi><mo>,</mo><mi>l</mi><mi>a</mi><mi>p</mi><mi>l</mi><mi>a</mi><mi>c</mi><msub><mi>e</mi><mi>r</mi></msub><mi>a</mi><mi>t</mi><mi>e</mi><mo>=</mo><mi>f</mi><mi>i</mi><msub><mi>t</mi><mi>g</mi></msub></mrow><annotation encoding="application/x-tex">likelihood,
-  laplace_rate = fit_g</annotation></semantics></math>laplace_rate_hat,
-quadrature_n =
-fit_g<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>e</mi><mi>t</mi><mi>t</mi><mi>i</mi><mi>n</mi><mi>g</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">settings</annotation></semantics></math>quadrature_n,
-use_exact_wendland =
-fit_g<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>e</mi><mi>t</mi><mi>t</mi><mi>i</mi><mi>n</mi><mi>g</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">settings</annotation></semantics></math>use_exact_wendland
-)</p>
-<p>post<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mi>o</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>r</mi><mi>i</mi><mi>o</mi><msub><mi>r</mi><mi>m</mi></msub><mi>e</mi><mi>a</mi><mi>n</mi><mi>p</mi><mi>o</mi><mi>s</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">posterior_mean
-post</annotation></semantics></math>probability <sub></sub>~</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">level_fit</span> <span class="op">&lt;-</span> <span class="va">fit_g</span><span class="op">$</span><span class="va">detail</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span><span class="va">post</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/level_posterior.html">level_posterior</a></span><span class="op">(</span></span>
+<span>  d <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  pi_j <span class="op">=</span> <span class="va">level_fit</span><span class="op">$</span><span class="va">spike_probability</span>,</span>
+<span>  omega_j <span class="op">=</span> <span class="va">level_fit</span><span class="op">$</span><span class="va">omega</span>,</span>
+<span>  beta_j <span class="op">=</span> <span class="va">level_fit</span><span class="op">$</span><span class="va">beta</span>,</span>
+<span>  sigma <span class="op">=</span> <span class="va">fit_g</span><span class="op">$</span><span class="va">sigma_hat</span>,</span>
+<span>  likelihood <span class="op">=</span> <span class="va">fit_g</span><span class="op">$</span><span class="va">likelihood</span>,</span>
+<span>  laplace_rate <span class="op">=</span> <span class="va">fit_g</span><span class="op">$</span><span class="va">laplace_rate_hat</span>,</span>
+<span>  quadrature_n <span class="op">=</span> <span class="va">fit_g</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="va">quadrature_n</span>,</span>
+<span>  use_exact_wendland <span class="op">=</span> <span class="va">fit_g</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="va">use_exact_wendland</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">post</span><span class="op">$</span><span class="va">posterior_mean</span></span>
+<span><span class="co">#&gt; [1] -1.686853e-01  6.040471e-18  1.686853e-01</span></span>
+<span><span class="va">post</span><span class="op">$</span><span class="va">probability</span></span>
+<span><span class="co">#&gt;          spike     wendland semicircle</span></span>
+<span><span class="co">#&gt; [1,] 0.8274089 1.665236e-06 0.17258945</span></span>
+<span><span class="co">#&gt; [2,] 0.9500170 6.374974e-07 0.04998237</span></span>
+<span><span class="co">#&gt; [3,] 0.8274089 1.665236e-06 0.17258945</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -452,9 +545,15 @@ post</annotation></semantics></math>probability <sub></sub>~</p>
 <h3 id="laplace-working-likelihood">Laplace working likelihood<a class="anchor" aria-label="anchor" href="#laplace-working-likelihood"></a>
 </h3>
 <p>The Laplace version is fitted by setting likelihood = “laplace”:</p>
-<p><sub></sub>~{r, eval=FALSE} fit_l &lt;- wswavelet( y, likelihood =
-“laplace”, filter.number = 6L, family = “DaubExPhase”, bc = “periodic”,
-quadrature_n = 24L ) <sub></sub>~</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit_l</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wswavelet.html">wswavelet</a></span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  likelihood <span class="op">=</span> <span class="st">"laplace"</span>,</span>
+<span>  filter.number <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">"DaubExPhase"</span>,</span>
+<span>  bc <span class="op">=</span> <span class="st">"periodic"</span>,</span>
+<span>  quadrature_n <span class="op">=</span> <span class="fl">24L</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>The default rate is computed once from the robust noise estimate and
 held fixed. For Laplace fits, the Wendland component has a finite-sum
 expression with a numerical fallback; the semicircle component is
@@ -472,25 +571,25 @@ and SNR regime.</p>
 <p>The default adaptive model estimates both the intercept and
 resolution trend in the logistic Wendland weight. For component or
 sensitivity analyses, the following alternatives are available:</p>
-<p><sub></sub>~{r, eval=FALSE} # One common empirical-Bayes mixture
-weight: fit_constant &lt;- wswavelet( y, likelihood = “gaussian”,
-omega_model = “constant” )</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="wendland-only-endpoint">Wendland-only endpoint:<a class="anchor" aria-label="anchor" href="#wendland-only-endpoint"></a>
-</h2>
-<p>fit_wendland &lt;- wswavelet( y, likelihood = “gaussian”, fixed_omega
-= 1 )</p>
-</div>
-<div class="section level2">
-<h2 id="semicircle-only-endpoint">Semicircle-only endpoint:<a class="anchor" aria-label="anchor" href="#semicircle-only-endpoint"></a>
-</h2>
-<p>fit_semicircle &lt;- wswavelet( y, likelihood = “gaussian”,
-fixed_omega = 0 ) <sub></sub>~</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># One common empirical-Bayes mixture weight:</span></span>
+<span><span class="va">fit_constant</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wswavelet.html">wswavelet</a></span><span class="op">(</span></span>
+<span>  <span class="va">y</span>, likelihood <span class="op">=</span> <span class="st">"gaussian"</span>, omega_model <span class="op">=</span> <span class="st">"constant"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Wendland-only endpoint:</span></span>
+<span><span class="va">fit_wendland</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wswavelet.html">wswavelet</a></span><span class="op">(</span></span>
+<span>  <span class="va">y</span>, likelihood <span class="op">=</span> <span class="st">"gaussian"</span>, fixed_omega <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Semicircle-only endpoint:</span></span>
+<span><span class="va">fit_semicircle</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wswavelet.html">wswavelet</a></span><span class="op">(</span></span>
+<span>  <span class="va">y</span>, likelihood <span class="op">=</span> <span class="st">"gaussian"</span>, fixed_omega <span class="op">=</span> <span class="fl">0</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>These endpoint fits are useful for understanding how the two slab
 shapes contribute to the complete model. They are not separate
 thresholding methods.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="independent-utility-functions">Independent utility functions<a class="anchor" aria-label="anchor" href="#independent-utility-functions"></a>
@@ -498,14 +597,25 @@ thresholding methods.</p>
 <div class="section level3">
 <h3 id="estimating-the-noise-scale">Estimating the noise scale<a class="anchor" aria-label="anchor" href="#estimating-the-noise-scale"></a>
 </h3>
-<p>estimate_noise_sd() can be used independently when a wavelet object
-has already been constructed:</p>
-<p><sub></sub>~{r} wavelet_object &lt;- wavethresh::wd( y, filter.number
-= 6L, family = “DaubExPhase”, type = “wavelet”, bc = “periodic”, verbose
-= FALSE ) detail_levels &lt;- 0:(wavethresh::nlevelsWT(wavelet_object) -
-1L)</p>
-<p>estimate_noise_sd( wavelet_object, detail_levels = detail_levels,
-mad_levels = 1L ) <sub></sub>~</p>
+<p><code><a href="../reference/estimate_noise_sd.html">estimate_noise_sd()</a></code> can be used independently when a
+wavelet object has already been constructed:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wavelet_object</span> <span class="op">&lt;-</span> <span class="fu">wavethresh</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/wavethresh/man/wd.html" class="external-link">wd</a></span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  filter.number <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">"DaubExPhase"</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"wavelet"</span>,</span>
+<span>  bc <span class="op">=</span> <span class="st">"periodic"</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">detail_levels</span> <span class="op">&lt;-</span> <span class="fl">0</span><span class="op">:</span><span class="op">(</span><span class="fu">wavethresh</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/wavethresh/man/nlevelsWT.html" class="external-link">nlevelsWT</a></span><span class="op">(</span><span class="va">wavelet_object</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1L</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/estimate_noise_sd.html">estimate_noise_sd</a></span><span class="op">(</span></span>
+<span>  <span class="va">wavelet_object</span>,</span>
+<span>  detail_levels <span class="op">=</span> <span class="va">detail_levels</span>,</span>
+<span>  mad_levels <span class="op">=</span> <span class="fl">1L</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.5958579</span></span></code></pre></div>
 <p>Unless a known supplied_sd is provided, the estimator is</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>σ</mi><mo accent="true">̂</mo></mover><mo>=</mo><mfrac><mrow><mrow><mi mathvariant="normal">median</mi><mo>⁡</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="prefix">|</mo><mi>d</mi><mo>−</mo><mi mathvariant="normal">median</mi><mo stretchy="false" form="prefix">(</mo><mi>d</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">|</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mn>0.6745</mn></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">
 \widehat{\sigma}
@@ -520,13 +630,31 @@ fallback if needed.</p>
 <div class="section level3">
 <h3 id="numerical-checks">Numerical checks<a class="anchor" aria-label="anchor" href="#numerical-checks"></a>
 </h3>
-<p>ws_numerical_checks() evaluates a fixed grid for Gaussian and Laplace
-likelihoods and for endpoint and interior values of the spike
-probability and Wendland weight:</p>
-<p><sub></sub>~{r} checks &lt;- ws_numerical_checks(quadrature_n = 32L)
-head( checks[, c( “likelihood”, “pi”, “omega”, “max_oddness_error”,
-“min_first_difference”, “max_support_excess”, “all_finite” )] )
-<sub></sub>~</p>
+<p><code><a href="../reference/ws_numerical_checks.html">ws_numerical_checks()</a></code> evaluates a fixed grid for
+Gaussian and Laplace likelihoods and for endpoint and interior values of
+the spike probability and Wendland weight:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">checks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ws_numerical_checks.html">ws_numerical_checks</a></span><span class="op">(</span>quadrature_n <span class="op">=</span> <span class="fl">32L</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span></span>
+<span>  <span class="va">checks</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"likelihood"</span>, <span class="st">"pi"</span>, <span class="st">"omega"</span>, <span class="st">"max_oddness_error"</span>,</span>
+<span>    <span class="st">"min_first_difference"</span>, <span class="st">"max_support_excess"</span>, <span class="st">"all_finite"</span></span>
+<span>  <span class="op">)</span><span class="op">]</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;   likelihood  pi omega max_oddness_error min_first_difference</span></span>
+<span><span class="co">#&gt; 1   gaussian 0.0     0      6.661338e-15         9.141978e-04</span></span>
+<span><span class="co">#&gt; 2    laplace 0.0     0      2.664535e-15        -8.881784e-16</span></span>
+<span><span class="co">#&gt; 3   gaussian 0.5     0      6.661338e-15         9.142390e-04</span></span>
+<span><span class="co">#&gt; 4    laplace 0.5     0      1.554312e-15        -1.554312e-15</span></span>
+<span><span class="co">#&gt; 5   gaussian 1.0     0      0.000000e+00         0.000000e+00</span></span>
+<span><span class="co">#&gt; 6    laplace 1.0     0      0.000000e+00         0.000000e+00</span></span>
+<span><span class="co">#&gt;   max_support_excess all_finite</span></span>
+<span><span class="co">#&gt; 1                  0       TRUE</span></span>
+<span><span class="co">#&gt; 2                  0       TRUE</span></span>
+<span><span class="co">#&gt; 3                  0       TRUE</span></span>
+<span><span class="co">#&gt; 4                  0       TRUE</span></span>
+<span><span class="co">#&gt; 5                  0       TRUE</span></span>
+<span><span class="co">#&gt; 6                  0       TRUE</span></span></code></pre></div>
 <p>The checks include:</p>
 <ul>
 <li>oddness of the shrinkage map,
@@ -603,7 +731,7 @@ order, noise-scale rule, and likelihood.</p>
 <p>Please cite the methodological paper when using WSwavelet:</p>
 <p>Sanyal, N. (2026). Resolution-Adaptive Compact-Support Priors for
 Bayesian Wavelet Denoising: A Wendland-Semicircle Slab Mixture for
-Low-SNR Signal Recovery. <em>Axioms</em>, <em>15</em>(9), 678. <a href="https://doi.org/10.3390/axioms15090678" class="external-link uri">https://doi.org/10.3390/axioms15090678</a></p>
+Low-SNR Signal Recovery. <em>Axioms</em>, <em>15</em>(9), 678. <a href="https://doi.org/10.3390/axioms15090678" class="external-link uri">https://doi.org/10.3390/axioms15090678</a>.</p>
 </div>
   </div>
 
