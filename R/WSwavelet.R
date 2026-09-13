@@ -689,21 +689,3 @@ ws_numerical_checks <- function(quadrature_n = 128L) {
       pi1_exact_zero = if (cases$pi[i] == 1) max(abs(z)) == 0 else NA)
   }))
 }
-
-# Example usage (kept commented out so sourcing this file does not run a fit):
-#
-# y <- your_signal_vector
-# fit <- wswavelet(
-#   y = y,
-#   likelihood = "laplace",
-#   filter.number = 10L,
-#   family = "DaubExPhase",
-#   bc = "periodic",
-#   beta_quantile = 0.99,
-#   quadrature_n = 48L
-# )
-# denoised_signal <- fit$estimate
-# fit$level_summary
-# curve <- evaluate_shrinkage_curve(fit, level_index = 1L)
-#
-# See Simulation_Analysis_snowfall.R for all parallel study drivers.

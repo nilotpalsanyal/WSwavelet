@@ -7,7 +7,7 @@ Authors@R: person("Nilotpal", "Sanyal", role = c("aut", "cre"), email = "nsanyal
 Maintainer: Nilotpal Sanyal <nsanyal@utep.edu>
 Description: Bayesian wavelet denoising using a resolution-adaptive spike-and-slab prior whose continuous slab is a mixture of a compactly supported Wendland-type density and the semicircle density. The package provides Gaussian and Laplace working-likelihood versions, empirical-Bayes fitting of resolution-specific slab weights, robust noise-scale estimation, posterior-mean coefficient shrinkage, reconstruction by the inverse discrete wavelet transform, and diagnostic tools.
 License: GPL-2 | GPL-3 
-URL: https://nilotpalsanyal.github.io/WSwavelet
+URL: https://nilotpalsanyal.github.io/WSwavelet/
 BugReports: https://github.com/nilotpalsanyal/WSwavelet/issues
 Depends:
     R (>= 4.1.0)
